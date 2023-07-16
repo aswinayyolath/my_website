@@ -1,0 +1,41 @@
+{% extends "admin_base.html" %}
+  {% block title %}
+      Create Blog
+  {% endblock %}
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'register.css'%}">
+<style>
+  form label {font-weight:bold;font-size:13px;}
+</style>
+    <div class="bg-dark text-white">
+        <div class="card-body" >
+          <form method="POST" onSubmit="return checkform()" enctype="multipart/form-data">
+            <div class="container">
+              <div class="form-group">
+                      <div class="row">
+                        <div class="col-sm-9">
+                          <h1>Write Your Blog</h1>
+                        </div>
+                        <div class="col-sm-3">
+                          <a href="{% url 'create-blog-markdown' %}" class="btn btn-outline-primary btn-lg">
+                           Enable Markdown
+                          </a>
+                        </div>
+                      </div>
+                       <hr>
+                      {% csrf_token %}
+                      {{ form.media }}
+                      {{ form.as_p }}
+                      <hr>
+                      <button type="submit" class="registerbtn">Publish</button>
+              </div>
+            </div>
+          </form>
+        </div>
+    </div>
+<script>
+  var name = "{{request.session.username|title}}"
+  document.getElementById("createdby").value = name;
+</script>
+{% endblock %}

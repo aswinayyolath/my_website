@@ -1,0 +1,619 @@
+  <!DOCTYPE html>
+  {% load static %}
+  {{ auth_error }}
+  <html>
+
+  <head>
+    <meta charset="utf-8">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>
+     {% block title %}
+     {% endblock %}
+    </title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <!-- Popper.JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+
+    <!-- Bootstrap CSS CDN -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <!-- Our Custom CSS -->
+    <link rel="stylesheet" href="{% static 'style.css'%}">
+    <link rel="stylesheet" href="{% static 'card_style.css'%}">
+
+    <!-- Font Awesome JS -->
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $('#sidebarCollapse').on('click', function () {
+          $('#sidebar').toggleClass('active');
+        });
+        $('#forgotpasscenter').on("click", function(){
+          $('#centersigninModal').modal('hide');
+          $('#SendMailModal').modal('show');
+          $('#sendEmailBtn').on("click", function(){
+          var email = $('#inputemailModal').val();
+          var csrf_token = '{{csrf_token}}';
+          $.ajax({
+            headers: { "X-CSRFToken": csrf_token },
+            method: "POST",
+            url: "{% url 'check_valid_email' %}",
+            dataType : "json",
+            data : {
+              "email" : email
+            },
+            success: function(result){
+              if(result.status==true){
+                $('#SendMailModal').modal('toggle');
+                $('#invalidEmailid').hide();
+                $("#emailsendsuccess").fadeTo(2000, 500).slideUp(500, function(){
+                  $("#emailsendsuccess").slideUp(500);
+                });
+              }
+              else
+                $('#invalidEmailid').show();
+            }
+          });
+        });
+        });
+        $('#fgpwd').on("click", function(){
+          $('#signinModal').modal('hide');
+          $('#SendMailModal').modal('show');
+          $('#sendEmailBtn').on("click", function(){
+          var email = $('#inputemailModal').val();
+          var csrf_token = '{{csrf_token}}';
+          $.ajax({
+            headers: { "X-CSRFToken": csrf_token },
+            method: "POST",
+            url: "{% url 'check_valid_email' %}",
+            dataType : "json",
+            data : {
+              "email" : email
+            },
+            success: function(result){
+              if(result.status==true){
+                $('#SendMailModal').modal('toggle');
+                $('#invalidEmailid').hide();
+                $("#emailsendsuccess").fadeTo(2000, 500).slideUp(500, function(){
+                  $("#emailsendsuccess").slideUp(500);
+                });
+              }
+              else
+                $('#invalidEmailid').show();
+            }
+          });
+        });
+        });
+        $('#signin').on("click", function(){
+          var user_name = $('#inputUsername').val();
+          var password = $('#inputPassword').val();
+          var token = '{{csrf_token}}';
+          $.ajax({
+            headers: { "X-CSRFToken": token },
+            method: "POST",
+            url: "{% url 'sign_in' %}",
+            dataType : "json",
+            data : {
+              "user_name" : user_name,
+              "password":password
+            },
+            success: function(result){
+              if(result.status==true)
+                window.location = "{% url 'create_blog' %}";
+              else if (result.status=='inactive'){
+                $('#erroremailverification').show();
+              }
+              else{
+                $('#erroremailverification').hide();
+                $('#loginerror').show();
+              }
+            }
+          });
+        });
+        $('#centerSignIn').on("click", function(){
+          var user_name = $('#inputUsernameCenterModal').val();
+          var password = $('#inputPasswordCenterModal').val();
+          var token = '{{csrf_token}}';
+          $.ajax({
+            headers: { "X-CSRFToken": token },
+            method: "POST",
+            url: "{% url 'sign_in' %}",
+            dataType : "json",
+            data : {
+              "user_name" : user_name,
+              "password":password,
+              "centralSignin":true
+            },
+            success: function(result){
+              if(result.status==true)
+                window.location = "{% url 'create_blog' %}";
+              else if(result.status=='centerTrue'){
+                $('#centersigninModal').modal('hide');
+                $("#LikeSignupSuccess").fadeTo(2000, 500).slideUp(500, function(){
+                $("#LikeSignupSuccess").slideUp(500);
+                location.reload(); 
+              });
+              }
+              else if (result.status=='inactive'){
+                $('#erroremailverificationCenterModal').show();
+              }
+              else{
+                $('#erroremailverificationCenterModal').hide();
+                $('#loginerrorCenterModal').show();
+              }
+            }
+          });
+        });
+        $('#saveSignUp').on("click", function(){
+          if($('#inputFirstName').val() == '' || 
+           $('#inputUsernamesigup').val() == '' || 
+           $('#inputSigninPassword').val() == '' ||
+           $('#ConfirmPassword').val() == '' ||
+           $('#inputEmail').val() == '' 
+           ){
+            $('#allfieldrequired').show();
+          return false;
+        }
+        else{
+          $('#allfieldrequired').hide();
+        }
+        var token = '{{csrf_token}}';
+        $.ajax({
+          headers: { "X-CSRFToken": token },
+          method: "POST",
+          url: "{% url 'sign_up' %}",
+          dataType : "json",
+          data : {
+            "FirstName": $('#inputFirstName').val(),
+            "user_name":$('#inputUsernamesigup').val(),
+            "password":$('#inputSigninPassword').val(),
+            "Email":$('#inputEmail').val()
+          },
+          success: function(result){
+            if(result.status==true){
+              $('#signupModal').modal('hide');
+              $('#SignupError').hide();
+              $("#SignupSuccess").fadeTo(2000, 500).slideUp(500, function(){
+                $("#SignupSuccess").slideUp(500);
+              });
+            }
+            else{
+              $('#signupModal').modal('hide');
+              $('#SignupError').show();
+            }
+          }
+        });
+      });
+        $('#ConfirmLogout').on("click", function(){
+          var token = '{{csrf_token}}';
+          $.ajax({
+            headers: { "X-CSRFToken": token },
+            method: "POST",
+            url: "{% url 'logout' %}",
+            success: function(result){
+              if(result.status==true){
+                window.location = "{% url 'home' %}";
+              }
+            }
+          });
+        });
+        $("#messageAlert").fadeTo(2000, 500).slideUp(500, function(){
+            $("#messageAlert").slideUp(500);
+          });
+        /***** Newly added- Fixed bugs *****/
+        $('#articleclick').on("click", function(){
+          location.href="{% url 'listarticles' 'dataeng' %}";
+        });
+        {% if request.get_full_path == '/listarticles/dataeng/' or request.get_full_path == '/listarticles/web/' or request.get_full_path == '/listarticles/mobile/' or request.get_full_path == '/listarticles/cloud/' %}
+           $(".dd").toggle();
+        {% endif %}
+        /***** Changes Ends here *****/
+        $(document).on('click', '.likebutton', function (event) {
+         var article_id = $(this).val();
+         var url_mask = "{% url 'likeview' pk=12345 %}".replace(/12345/, article_id.toString());
+         var isLoggedIn = $('#userdata').val();
+          if(isLoggedIn == ''){
+            $('#centersigninModal').modal('show'); 
+          }
+          else{
+            var csrf_token = '{{csrf_token}}';
+            $.ajax({
+            headers: { "X-CSRFToken": csrf_token },
+            method: "POST",
+            url: url_mask,
+            dataType : "json",
+            success: function(result){
+              if(result.status==true){
+                location.reload(); 
+              }
+            }
+          });
+          }
+        });
+        $('#registerforlike').on('click', function () {
+          $('#centersigninModal').modal('hide'); 
+          $('#signupModal').modal('show'); 
+        });
+      });
+      function check_fun(){
+        var firstPass = $('#inputSigninPassword').val();
+        var secondPass = $('#ConfirmPassword').val();
+        if(firstPass!=secondPass){
+          $('#passwordmismatch').show();
+          $('#passwordlengthError').hide();
+          return true;
+        } 
+        else{
+          $('#passwordmismatch').hide();
+          if($('#inputSigninPassword').val().length < 8){
+            $('#passwordlengthError').show();
+          }
+          else{
+            $('#passwordlengthError').hide();
+          }
+          return false;
+        }
+      }
+      function clear_confirm(){
+        $("#ConfirmPassword").val("");
+      }
+      function ValidateEmail(inputText)
+      {
+        var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        if(inputText.value.match(mailformat))
+        {
+          $('#invalidEmail').hide();
+          return true;
+        }
+        else
+        {
+          $('#invalidEmail').show();
+          return false;
+        }
+      }
+      function checkform(){
+        if($('#title').val() == ''){
+          $('#titleRequired').show();
+          return false;
+        }
+        else if ($('#blogContent').val() == ''){
+          $('#titleRequired').hide();
+          $('#ContentRequired').show();
+          return false;
+        }
+        else
+          return true;
+      }
+      function showPassword() {
+        var x = document.getElementById("inputPassword");
+        if (x.type === "password") {
+            x.type = "text";
+        } else {
+        x.type = "password";
+      }
+      var y = document.getElementById("inputPasswordCenterModal");
+        if (y.type === "password") {
+            y.type = "text";
+        } else {
+        y.type = "password";
+      }
+    } 
+
+    function chkfields(){
+      if($('#inputFirstName').val() == '' || 
+           $('#inputUsernamesigup').val() == '' || 
+           $('#inputSigninPassword').val() == '' ||
+           $('#ConfirmPassword').val() == '' ||
+           $('#inputEmail').val() == '' 
+           ){
+            $('#allfieldrequired').show();
+          return false;
+        }
+        else{
+          $('#allfieldrequired').hide();
+        }
+    }
+
+    </script>
+  </head>
+  <body>
+   <div class="modal fade" id="signinModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle" style="color: #000;">Sign in</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group row">
+            <label for="inputUsername" class="col-sm-3 col-form-label">Username</label>
+            <div class="col-sm-9">
+              <input type="text" class="form-control" id="inputUsername" placeholder="Username">
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputPassword" class="col-sm-3 col-form-label">Password</label>
+            <div class="col-sm-9">
+              <input type="password" class="form-control" id="inputPassword" placeholder="Password">
+              <input type="checkbox" style="margin-top: 10px;" onclick="showPassword()">Show Password 
+              <label style="margin-left: 40px;cursor: pointer;color: blue" id="fgpwd">Forgot password?</label>
+              <p style="display: none; margin-top: 10px; color: red;font-family: Tahoma, sans-serif;" id="loginerror">Invalid username or password</p>
+              <p style="display: none; margin-top: 10px; color: red;font-family: Tahoma, sans-serif;" id="erroremailverification">Please verify your email to login</p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary"  id="signin">Sign in</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Button trigger modal -->
+
+  <!-- Modal -->
+  <div class="modal fade" id="signupModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle" style="color: #000;">Sign up</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group row">
+            <div class="col-sm-12">
+              <label for="inputName" style="font-family: Tahoma, sans-serif;">Name</label>
+              <input type="text" class="form-control" id="inputFirstName" placeholder="Enter FirstName" onchange="chkfields();">
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="col-sm-12">
+              <label for="inputUsernamesigup" style="font-family: Tahoma, sans-serif;">Username</label>
+              <input type="text" class="form-control" id="inputUsernamesigup" placeholder="Enter Username" onchange="chkfields();">
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="col-sm-12">
+              <label for="inputPassword" style="font-family: Tahoma, sans-serif;">Password</label>
+              <input type="password" class="form-control" id="inputSigninPassword" placeholder="Enter Password" onchange="clear_confirm();chkfields()">
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="col-sm-12">
+              <label for="ConfirmPassword" style="font-family: Tahoma, sans-serif;">Confirm Password</label>
+              <input type="password" class="form-control" id="ConfirmPassword" placeholder="Confirm Password" onchange="check_fun();chkfields()">
+              <p style="display: none; margin-top: 10px; color: red;font-family: Tahoma, sans-serif;" id="passwordmismatch">Passwords dosen't match</p>
+              <p style="display: none; margin-top: 10px; color: red;font-family: Tahoma, sans-serif;" id="passwordlengthError">Password must contain atlest 8 character</p>
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="col-sm-12">
+              <label for="inputEmail" style="font-family: Tahoma, sans-serif;">E-mail</label>
+              <input type="email" class="form-control" id="inputEmail" placeholder="Enter E-mail" onchange="ValidateEmail(this);chkfields()">
+              <p style="display: none; margin-top: 10px; color: red;font-family: Tahoma, sans-serif;" id="invalidEmail">Please enter a vaild E-mail</p>
+              <p id="allfieldrequired" style="display: none; margin-top: 10px; color: red;font-family: Tahoma, sans-serif;">All fields are required</p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="saveSignUp">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-------------------Login to Like Modal----------------->
+        <div class="modal fade" id="centersigninModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle" style="color: #000;">Login to continue</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="form-group row">
+                  <label for="inputUsernameCenterModal" class="col-sm-3 col-form-label">Username</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" id="inputUsernameCenterModal" placeholder="Username">
+                  </div>
+                </div>
+              <div class="form-group row">
+                <label for="inputPasswordCenterModal" class="col-sm-3 col-form-label">Password</label>
+                <div class="col-sm-9">
+                  <input type="password" class="form-control" id="inputPasswordCenterModal" placeholder="Password">
+                  <input type="checkbox" style="margin-top: 10px;" onclick="showPassword()">Show Password 
+                  <label style="margin-top: 10px; margin-left: 50px; color: green;font-family: Tahoma, sans-serif;cursor: pointer;" id="registerforlike">Register</label>
+                  <label style="margin-left: 40px;cursor: pointer;color: blue;float: right;" id="forgotpasscenter">Forgot password?</label>
+                  <div>
+                    <p style="display: none; margin-top: 40px; color: red;font-family: Tahoma, sans-serif;" id="loginerrorCenterModal">Invalid username or password</p>
+                    <p style="display: none; margin-top: 40px; color: red;font-family: Tahoma, sans-serif;" id="erroremailverificationCenterModal">Please verify your e-mail to login</p>
+                  </div>
+                  
+                </div>
+              </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary"  id="centerSignIn">Sign in</button>
+              </div>
+            </div>
+          </div>
+        </div>
+<!-------------------Login to Like Modal Ends----------------->
+
+<!-------------------Enter Mailid Modal----------------->
+        <div class="modal fade" id="SendMailModal" tabindex="-1" role="dialog" aria-labelledby="SendMailModalTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="SendMailModalTitle" style="color: #000;">Enter Email to proceed</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="form-group row">
+                  <label for="inputemailModal" class="col-sm-3 col-form-label">E-mail</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" id="inputemailModal" placeholder="E-mail">
+                  </div>
+                  <div>
+                    <p style="display: none; margin-top: 10px; padding:20px; color: red;font-family: Tahoma, sans-serif;" id="invalidEmailid">Please enter registered E-mail address</p>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary"  id="sendEmailBtn">Submit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+<!-------------------Enter Mailid Modal Ends----------------->
+
+
+<!-------------------signout Confirmation Modal Begins----------------->
+<div id="myModal" class="modal fade">
+    <div class="modal-dialog modal-confirm">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h6 style="color: #000;text-align: center;">Are you sure you want to signout</h6>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" id="ConfirmLogout">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div> 
+<!-------------------signout Confirmation Modal Ends----------------->
+<div class="wrapper">
+  <!-- Sidebar  -->
+  <nav id="sidebar">
+      <div class="sidebar-header">
+          <h3>Tech Trends</h3>
+          <strong>TT</strong>
+      </div>
+      <ul class="list-unstyled components">
+          <li class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+              <a href="{% url 'home'%}">
+                  <i class="fas fa-home"></i>
+                  Home
+              </a>
+          </li>
+          <li class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}">
+              <a href="{% url 'about'%}">
+                  <i class="fa fa-user"></i>
+                  About Me
+              </a>
+          </li>
+          <li id="articleclick">
+              <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                  <i class="fas fa-copy"></i>
+                  Articles
+              </a>
+              <ul class="collapse list-unstyled dd" id="pageSubmenu">
+                  <li class="{% if request.get_full_path == '/listarticles/dataeng/' %}active{% endif %}">
+                      <a href="{% url 'listarticles' 'dataeng' %}">Data Engineering</a>
+                  </li>
+                  <li class="{% if request.get_full_path == '/listarticles/web/' %}active{% endif %}">
+                      <a href="{% url 'listarticles' 'web' %}">Web Development</a>
+                  </li>
+                  <li class="{% if request.get_full_path == '/listarticles/mobile/' %}active{% endif %}">
+                      <a href="{% url 'listarticles' 'mobile' %}">Mobile Development</a>
+                  </li>
+                  <li class="{% if request.get_full_path == '/listarticles/cloud/' %}active{% endif %}">
+                      <a href="{% url 'listarticles' 'cloud' %}">Cloud Technologies</a>
+                  </li>
+              </ul>
+          </li>
+          {% if logged_user %}
+            <li class="{% if request.resolver_match.url_name == 'create_blog' %}active{% endif %}">
+                      <a href="{% url 'create_blog' %}">
+                          <i class="fas fa-edit"></i>
+                          Write Article
+                      </a>
+                  </li>
+            <li class="{% if request.resolver_match.url_name == 'myarticles' or request.resolver_match.url_name == 'updateblog'%}active{% endif %}">
+                <a href="{% url 'myarticles' %}">
+                    <i class="fas fa-copy"></i>
+                     My Articles
+                </a>
+            </li>
+          {% endif %}
+          <li class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}">
+              <a href="{% url 'contact'%}">
+                  <i class="fas fa-paper-plane"></i>
+                  Contact
+              </a>
+          </li>
+      </ul>
+  </nav>
+  <!-- Page Content  -->
+  <div id="content">
+      <nav class="navbar navbar-expand-lg" style="background: #000;">
+          <div class="container-fluid" style="background: #000;">
+              <button type="button" id="sidebarCollapse" class="btn btn-info">
+                  <i class="fas fa-align-left"></i>
+              </button>
+              {% if not logged_user %}
+              <ul class="nav ml-auto">
+                  <li style="margin-right: 30px">
+                      <button class="btn btn-success" data-toggle="modal" data-target="#signupModal">Sign up</button>
+                  </li>
+                  <li>
+                      <button class="btn btn-primary" data-toggle="modal" data-target="#signinModal">Sign in</button>
+                  </li>
+              </ul>
+              {% else %}
+              <ul class="nav navbar-nav ml-auto">
+                     <li class="nav-item active">
+                        <p style="margin-right: 30px; color: #fff; font-weight: bold;">{{request.session.username|title}}</p>
+                    </li>
+                    <li class="nav-item">
+                        <button class="btn btn-danger" data-toggle="modal" data-target="#myModal" a href="">Sign out</button>
+                    </li>
+              </ul>
+              {% endif %}
+          </div>
+      </nav>
+      <div class="alert alert-success" style="display: none;" id="SignupSuccess">
+        <button type="button" class="close" data-dismiss="alert">x</button>
+        <strong>Successfully</strong> created account. Please verify your e-mail...
+      </div>
+      <div class="alert alert-success" style="display: none;" id="LikeSignupSuccess">
+        <button type="button" class="close" data-dismiss="alert">x</button>
+        <strong>Login</strong> Successfull ...
+      </div>
+      <div class="alert alert-success" style="display: none;" id="emailsendsuccess">
+        <button type="button" class="close" data-dismiss="alert">x</button>
+        Password reset mail has been send to your registered email id!!!
+      </div>
+    <div class="alert alert-danger" role="alert" style="display: none;" id="SignupError">
+        The username already exists!!!
+    </div>
+    {% if messages %}
+      {% for message in messages %}
+        {% if message.message == 'You are not authorized to view this page' %}
+          <div class ="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert" id="messageAlert">
+            <button type="button" class="close" data-dismiss="alert">x</button>
+            {{message}}
+          </div>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+  {% block content %}
+  {% endblock %}
+  </div>
+  <input type="text" name="userdata" id="userdata" value="{{logged_user}}" style="display: none;" />
+</div>
+  </body>
+</html>

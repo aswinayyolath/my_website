@@ -1,0 +1,39 @@
+{% extends "admin_base.html" %}
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'register.css'%}">
+<style>
+  form label {font-weight:bold;font-size:13px;}
+  pre{
+    color: #50fb02;
+    border: 1px solid #fff;
+    padding: 10px;
+    border-radius: 5px;
+  }
+  img{
+          width: 90%;
+          padding: 10px;
+        }
+</style>
+    <div class="bg-dark text-white">
+        <div class="card-body" >
+          <form method="POST" onSubmit="return checkform()" enctype="multipart/form-data">
+            <div class="container">
+              <div class="form-group">
+                       <h1>Update Blog</h1>
+                       <hr>
+                      {% csrf_token %}
+                      {{ form.media }}
+                      {{ form.as_p }}
+                      <hr>
+                      <button type="submit" class="registerbtn">Update</button>
+              </div>
+            </div>
+          </form>
+        </div>
+    </div>
+<script>
+  var name = "{{request.session.username|title}}"
+  document.getElementById("createdby").value = name;
+</script>
+{% endblock %}
